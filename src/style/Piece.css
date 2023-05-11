@@ -1,0 +1,58 @@
+.piece {
+	background-size: cover;
+
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+}
+
+.pieceContainer {
+}
+
+/* Pawn */
+.wp {
+	background-image: url('/public/pieces/wp.svg');
+}
+.bp {
+	background-image: url('/public/pieces/bp.svg');
+}
+
+/* Rook */
+.wr {
+	background-image: url('/public/pieces/wr.svg');
+}
+.br {
+	background-image: url('/public/pieces/br.svg');
+}
+
+/* Knight */
+.wn {
+	background-image: url('/public/pieces/wn.svg');
+}
+.bn {
+	background-image: url('/public/pieces/bn.svg');
+}
+
+/* Bishop */
+.wb {
+	background-image: url('/public/pieces/wb.svg');
+}
+.bb {
+	background-image: url('/public/pieces/bb.svg');
+}
+
+/* Queen */
+.wq {
+	background-image: url('/public/pieces/wq.svg');
+}
+.bq {
+	background-image: url('/public/pieces/bq.svg');
+}
+
+/* King */
+.wk {
+	background-image: url('/public//pieces/wk.svg');
+}
+.bk {
+	background-image: url('/public/pieces/bk.svg');
+}
