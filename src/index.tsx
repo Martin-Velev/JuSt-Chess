@@ -1,11 +1,13 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from 'react'
+import { createRoot } from 'react-dom/client';
 import Chess from "./components/Chess";
+import './index.css'
 
-const root = (
+const root = createRoot(document.getElementById('root'))
+root.render(	
 	<React.StrictMode>
 		<Chess />
 	</React.StrictMode>
 )
-ReactDOM.render(root, document.getElementById('root'))
+
 

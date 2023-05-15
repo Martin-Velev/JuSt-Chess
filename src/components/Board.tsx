@@ -7,12 +7,12 @@ import { Board, Square } from "../game/board";
 
 type BoardComponentProps = {
 	board: Board
+	onSqrClick: Function
 
 }
-export default function BoardComponent({board}: BoardComponentProps) {
+export default function BoardComponent({board, onSqrClick: onPieceClick}: BoardComponentProps) {
 	// const [board, setBoard] = useState()
 
-	console.log(board)
 	return (
 		<div className="board">
 			{board.grid.map((rank: Square[], i:number) => (
@@ -22,7 +22,7 @@ export default function BoardComponent({board}: BoardComponentProps) {
 					className="rank"
 				>
 					{rank.map((sqr) => (
-						<div key={sqr.id} id={sqr.id} className={`sqr ${sqr.color}`}>
+						<div onClick={e => onPieceClick(sqr)}  key={sqr.id} id={sqr.id} className={`sqr ${sqr.color}`}>
 							{sqr.piece && <PieceComponent piece={sqr.piece} />}
 						</div>
 					))}

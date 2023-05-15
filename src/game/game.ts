@@ -1,4 +1,4 @@
-import { Board } from './board'
+import { Board, Piece } from './board'
 
 export class ChessGame {
 	board: Board

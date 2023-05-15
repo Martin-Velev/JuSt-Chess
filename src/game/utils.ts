@@ -7,10 +7,8 @@ import { Board, Square } from './board'
  * @returns {Board} Board object
  */
 export function getBoardFromFEN(fen: string) {
-	console.log(fen)
 
 	const fields = fen.split(' ')
-	console.log('fields', fields)
 	// SETUP PIECES
 
 	const INITIAL_POSITION = fields[0]
@@ -77,7 +75,6 @@ export function positionFromCoordinates([i, j]: [number, number]): string {
 
 export function coordinatesFromPosition(position: string): [number, number] {
 	const [file, rank] = position.split('')
-	console.log(position, rank)
 	const i = 8 - RANKS.indexOf(parseInt(rank)) - 1
 	const j = FILES.indexOf(file)
 	return [i, j]

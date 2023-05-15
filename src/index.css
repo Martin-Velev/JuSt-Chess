@@ -3,3 +3,13 @@ body {
 	width: 100vw;
 	height: 100vh;
 }
+
+.row {
+	display: flex;
+	flex-flow: row;
+}
+
+.col {
+	display: flex;
+	flex-flow: column;
+}
