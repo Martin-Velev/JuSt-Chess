@@ -109,13 +109,9 @@ function legalBishopMoves(piece: Piece, board: Board): Move[] {
 	) {
 		const newI = i + iIncr
 		const newJ = j + jIncr
-		console.log('iIncr, jIncr', iIncr, jIncr)
-		console.log('newI, newJ', newI, newJ)
 		if (newI > 7 || newI < 0 || newJ > 7 || newJ < 0) {
 			return
 		}
-
-		console.log('recursive checking', positionFromCoordinates([newI, newJ]))
 
 		// if (i === iCur && j === jCur) return
 
@@ -146,7 +142,6 @@ function legalBishopMoves(piece: Piece, board: Board): Move[] {
 			checkDiagonal([newI, newJ], [iIncr, jIncr], board)
 		}
 	}
-	console.log('--------')
 
 	// top left
 	checkDiagonal([iCur, jCur], [-1, -1], board)
