@@ -80,38 +80,8 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 	const originSqr = board.grid[iCur][jCur]
 	const pawnDir = piece.color === 'white' ? -1 : +1
 
-	// Move one forward
-	// check if there's room ahead
-	let targetI = iCur + pawnDir
-	if (targetI < 8 && targetI >= 0) {
-		const oneForward = new Move()
-		oneForward.from = originSqr
-		oneForward.to = board.grid[targetI][jCur]
-		if (!oneForward.to.piece) {
-			moves.push(oneForward)
-		}else {
-			return
-		}
-	}
-
-	// Move 2 forward
-	// check if there's room ahead
-	targetI = iCur + pawnDir * 2
-	if (targetI < 8 && targetI >= 0) {
-		const initialRank = piece.color === 'white' ? 2 : 7
-		const isInitalRank = parseInt(piece.position.split('')[1]) === initialRank
-		const twoForward = new Move()
-		twoForward.from = originSqr
-		twoForward.to = board.grid[targetI][jCur]
-		
-
-		if (isInitalRank && !twoForward.to.piece) {
-			moves.push(twoForward)
-		}
-	}
-
 	// Captures
-	targetI = iCur + pawnDir
+	let targetI = iCur + pawnDir
 	if (targetI < 8 && targetI >= 0) {
 		// CAPTURE LEFT
 		let targetJLeft = jCur - 1
@@ -139,6 +109,35 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 				captureRight.to = board.grid[targetI][targetJRight]
 				moves.push(captureRight)
 			}
+		}
+	}
+
+	// Move one forward
+	// check if there's room ahead
+	targetI = iCur + pawnDir
+	if (targetI < 8 && targetI >= 0) {
+		const oneForward = new Move()
+		oneForward.from = originSqr
+		oneForward.to = board.grid[targetI][jCur]
+		if (!oneForward.to.piece) {
+			moves.push(oneForward)
+		} else {
+			return moves
+		}
+	}
+
+	// Move 2 forward
+	// check if there's room ahead
+	targetI = iCur + pawnDir * 2
+	if (targetI < 8 && targetI >= 0) {
+		const initialRank = piece.color === 'white' ? 2 : 7
+		const isInitalRank = parseInt(piece.position.split('')[1]) === initialRank
+		const twoForward = new Move()
+		twoForward.from = originSqr
+		twoForward.to = board.grid[targetI][jCur]
+
+		if (isInitalRank && !twoForward.to.piece) {
+			moves.push(twoForward)
 		}
 	}
 
