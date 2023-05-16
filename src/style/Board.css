@@ -17,9 +17,22 @@
 }
 
 .white {
-	background-color: white;
+	background-color: white !important;
 }
 
 .black {
-	background-color: rgb(75, 75, 75);
+	background-color: rgb(75, 75, 75) !important;
+}
+
+.legal-move {
+	/* background-color: green; */
+	background: radial-gradient(rgb(39, 113, 50) 19%, rgba(0, 0, 0, 0) 20%);
+}
+
+.legal-capture {
+	background: radial-gradient(
+		transparent 0%,
+		transparent 79%,
+		rgba(55, 212, 7, 0.7) 80%
+	);
 }
