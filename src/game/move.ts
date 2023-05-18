@@ -13,7 +13,7 @@ export class Move {
 function checkLine(
 	[i, j]: [number, number],
 	[iIncr, jIncr]: [number, number],
-	board: Board,
+	board: Square[][],
 	piece: Piece,
 	originSqr: Square,
 	moves: Move[]
@@ -26,7 +26,7 @@ function checkLine(
 
 	// if (i === iCur && j === jCur) return
 
-	const trgtSqr = board.grid[newI][newJ]
+	const trgtSqr = board[newI][newJ]
 	if (trgtSqr.piece) {
 		if (piece.color === trgtSqr.piece.color) {
 			// Same colored piece
@@ -35,7 +35,7 @@ function checkLine(
 			// Opposite color piece (Capture)
 			let move: Move = new Move()
 			move.from = originSqr
-			move.to = board.grid[newI][newJ]
+			move.to = board[newI][newJ]
 			move.piece = piece
 			move.isCapture = true
 
@@ -44,7 +44,7 @@ function checkLine(
 	} else {
 		let move: Move = new Move()
 		move.from = originSqr
-		move.to = board.grid[newI][newJ]
+		move.to = board[newI][newJ]
 		move.piece = piece
 		move.isCapture = false
 		moves.push(move)
@@ -60,7 +60,7 @@ function checkLine(
 	}
 }
 
-export function generateLegalMoves(piece: Piece, board: Board): Move[] {
+export function generateLegalMoves(piece: Piece, board: Square[][]): Move[] {
 	if (!piece || !board) return
 	switch (piece.type) {
 		case 'Pawn':
@@ -80,13 +80,13 @@ export function generateLegalMoves(piece: Piece, board: Board): Move[] {
 	}
 }
 
-function legalPawnMoves(piece: Piece, board: Board): Move[] {
+function legalPawnMoves(piece: Piece, board: Square[][]): Move[] {
 	if (piece.type !== 'Pawn') return null
 	const moves = []
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position)
 
-	const originSqr = board.grid[iCur][jCur]
+	const originSqr = board[iCur][jCur]
 	const pawnDir = piece.color === 'white' ? -1 : +1
 
 	// Captures
@@ -95,13 +95,13 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 		// CAPTURE LEFT
 		let targetJLeft = jCur - 1
 		if (targetJLeft > 0) {
-			const targetPiece = board.grid[targetI][targetJLeft].piece
+			const targetPiece = board[targetI][targetJLeft].piece
 
 			if (targetPiece && targetPiece.color !== piece.color) {
 				const captureLeft = new Move()
 
 				captureLeft.from = originSqr
-				captureLeft.to = board.grid[targetI][targetJLeft]
+				captureLeft.to = board[targetI][targetJLeft]
 
 				moves.push(captureLeft)
 			}
@@ -109,13 +109,13 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 
 		let targetJRight = jCur + 1
 		if (targetJRight < 8) {
-			const targetPiece = board.grid[targetI][targetJRight].piece
+			const targetPiece = board[targetI][targetJRight].piece
 
 			if (targetPiece && targetPiece.color !== piece.color) {
 				const captureRight = new Move()
 
 				captureRight.from = originSqr
-				captureRight.to = board.grid[targetI][targetJRight]
+				captureRight.to = board[targetI][targetJRight]
 				moves.push(captureRight)
 			}
 		}
@@ -127,7 +127,7 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 	if (targetI < 8 && targetI >= 0) {
 		const oneForward = new Move()
 		oneForward.from = originSqr
-		oneForward.to = board.grid[targetI][jCur]
+		oneForward.to = board[targetI][jCur]
 		if (!oneForward.to.piece) {
 			moves.push(oneForward)
 		} else {
@@ -143,7 +143,7 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 		const isInitalRank = parseInt(piece.position.split('')[1]) === initialRank
 		const twoForward = new Move()
 		twoForward.from = originSqr
-		twoForward.to = board.grid[targetI][jCur]
+		twoForward.to = board[targetI][jCur]
 
 		if (isInitalRank && !twoForward.to.piece) {
 			moves.push(twoForward)
@@ -155,13 +155,13 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 	return moves
 }
 
-function legalBishopMoves(piece: Piece, board: Board): Move[] {
+function legalBishopMoves(piece: Piece, board: Square[][]): Move[] {
 	let moves: Move[] = []
 
 	// if (piece.type !== 'Bishop' ) return null
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position)
-	const originSqr = board.grid[iCur][jCur]
+	const originSqr = board[iCur][jCur]
 
 	const directions: [number, number][] = [
 		[-1, -1],
@@ -189,11 +189,11 @@ function legalBishopMoves(piece: Piece, board: Board): Move[] {
 	return moves
 }
 
-function legalRookMoves(piece: Piece, board: Board): Move[] {
+function legalRookMoves(piece: Piece, board: Square[][]): Move[] {
 	let moves: Move[] = []
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position)
-	const originSqr = board.grid[iCur][jCur]
+	const originSqr = board[iCur][jCur]
 
 	const directions: [number, number][] = [
 		[-1, 0], // UP
@@ -219,17 +219,17 @@ function legalRookMoves(piece: Piece, board: Board): Move[] {
 	return moves
 }
 
-function legalQueenMoves(piece: Piece, board: Board): Move[] {
+function legalQueenMoves(piece: Piece, board: Square[][]): Move[] {
 	const diagonalMoves = legalBishopMoves(piece, board)
 	const lateralMoves = legalRookMoves(piece, board)
 
 	return [...diagonalMoves, ...lateralMoves]
 }
 
-function legalKnightMoves(piece: Piece, board: Board): Move[] {
+function legalKnightMoves(piece: Piece, board: Square[][]): Move[] {
 	const moves: Move[] = []
 	const [i, j] = coordinatesFromPosition(piece.position)
-	const originSqr = board.grid[i][j]
+	const originSqr = board[i][j]
 
 	let directions: [number, number][] = [
 		[+2, +1],
@@ -252,7 +252,7 @@ function legalKnightMoves(piece: Piece, board: Board): Move[] {
 
 		// if (i === iCur && j === jCur) return
 
-		const trgtSqr = board.grid[newI][newJ]
+		const trgtSqr = board[newI][newJ]
 		if (trgtSqr.piece) {
 			if (piece.color === trgtSqr.piece.color) {
 				// Same colored piece
@@ -261,7 +261,7 @@ function legalKnightMoves(piece: Piece, board: Board): Move[] {
 				// Opposite color piece (Capture)
 				let move: Move = new Move()
 				move.from = originSqr
-				move.to = board.grid[newI][newJ]
+				move.to = board[newI][newJ]
 				move.piece = piece
 				move.isCapture = true
 
@@ -270,7 +270,7 @@ function legalKnightMoves(piece: Piece, board: Board): Move[] {
 		} else {
 			let move: Move = new Move()
 			move.from = originSqr
-			move.to = board.grid[newI][newJ]
+			move.to = board[newI][newJ]
 			move.piece = piece
 			move.isCapture = false
 			moves.push(move)
@@ -280,10 +280,10 @@ function legalKnightMoves(piece: Piece, board: Board): Move[] {
 	return moves
 }
 
-function legalKingMoves(piece: Piece, board: Board) {
+function legalKingMoves(piece: Piece, board: Square[][]) {
 	const moves: Move[] = []
 	const [i, j] = coordinatesFromPosition(piece.position)
-	const originSqr = board.grid[i][j]
+	const originSqr = board[i][j]
 
 	let directions: [number, number][] = [
 		[-1, 0], // UP
@@ -305,7 +305,7 @@ function legalKingMoves(piece: Piece, board: Board) {
 
 		// if (i === iCur && j === jCur) return
 
-		const trgtSqr = board.grid[newI][newJ]
+		const trgtSqr = board[newI][newJ]
 		if (trgtSqr.piece) {
 			if (piece.color === trgtSqr.piece.color) {
 				// Same colored piece
@@ -314,7 +314,7 @@ function legalKingMoves(piece: Piece, board: Board) {
 				// Opposite color piece (Capture)
 				let move: Move = new Move()
 				move.from = originSqr
-				move.to = board.grid[newI][newJ]
+				move.to = board[newI][newJ]
 				move.piece = piece
 				move.isCapture = true
 
@@ -323,7 +323,7 @@ function legalKingMoves(piece: Piece, board: Board) {
 		} else {
 			let move: Move = new Move()
 			move.from = originSqr
-			move.to = board.grid[newI][newJ]
+			move.to = board[newI][newJ]
 			move.piece = piece
 			move.isCapture = false
 			moves.push(move)

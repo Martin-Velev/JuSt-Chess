@@ -59,7 +59,7 @@ export default function Chess() {
 				possibleMoveSqrs.forEach((sqrId) => {
 					const [i, j] = coordinatesFromPosition(sqrId)
 
-					const curSqrl = game.board.grid[i][j]
+					const curSqrl = game.board[i][j]
 					if (curSqrl.piece) {
 						curSqrl.styles.push('legal-capture')
 					} else {
@@ -73,16 +73,15 @@ export default function Chess() {
 	}
 
 	function cleanBoardStyles() {
-		const cleanBoard = {
-			grid: game.board.grid.map((rank) => {
-				return rank.map((sqr) => {
-					return {
-						...sqr,
-						styles: [],
-					}
-				})
-			}),
-		}
+		// console.log(game)
+		const cleanBoard = game.board.map((rank: Square[]) => {
+			return rank.map((sqr) => {
+				return {
+					...sqr,
+					styles: [],
+				}
+			})
+		})
 
 		game.board = cleanBoard
 	}

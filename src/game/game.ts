@@ -3,11 +3,11 @@ import { Move } from './move'
 import { coordinatesFromPosition } from './utils'
 
 export class ChessGame {
-	board: Board
+	board: Square[][]
 	legalMoves: Move[]
 	toMove: 'white' | 'black'
 
-	constructor(board: Board) {
+	constructor(board: Square[][]) {
 		this.board = board
 		this.toMove = 'white'
 	}
@@ -15,11 +15,11 @@ export class ChessGame {
 	makeMove(move: Move) {
 		const [i, j] = coordinatesFromPosition(move.to.id)
 		const [iOrigin, jOrigin] = coordinatesFromPosition(move.from.id)
-		const newGrid: Square[][] = [...this.board.grid]
+		const newGrid: Square[][] = [...this.board]
 
 		newGrid[i][j].piece = { ...move.piece, position: move.to.id }
 		newGrid[iOrigin][jOrigin].piece = null
-		this.board.grid = newGrid
+		this.board = newGrid
 
 		this.toMove = this.toMove === 'white' ? 'black' : 'white'
 	}

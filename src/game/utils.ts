@@ -4,9 +4,9 @@ import { Board, Square } from './board'
 /**
  *
  * @param {string} fen The Forsyth–Edwards Notation for the position
- * @returns {Board} Board object
+ * @returns {Square[][]} Board object
  */
-export function getBoardFromFEN(fen: string) {
+export function getBoardFromFEN(fen: string): Square[][] {
 
 	const fields = fen.split(' ')
 	// SETUP PIECES
@@ -42,7 +42,7 @@ export function getBoardFromFEN(fen: string) {
 		}
 	}
 
-	return new Board(grid)
+	return grid
 }
 
 /**

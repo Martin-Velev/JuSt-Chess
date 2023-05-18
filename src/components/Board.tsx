@@ -5,7 +5,7 @@ import PieceComponent from './Piece'
 import { Board, Square } from '../game/board'
 
 type BoardComponentProps = {
-	board: Board
+	board: Square[][]
 	onSqrClick: Function
 }
 export default function BoardComponent({
@@ -16,7 +16,7 @@ export default function BoardComponent({
 
 	return (
 		<div className="board">
-			{board.grid.map((rank: Square[], i: number) => (
+			{board.map((rank: Square[], i: number) => (
 				<div
 					id={'rank' + RANKS[8 - (i + 1)]}
 					key={RANKS[8 - (i + 1)]}
