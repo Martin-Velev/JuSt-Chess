@@ -6,7 +6,7 @@ export class Move {
 	from: Square
 	piece: Piece
 	isCapture?: boolean
-	
+
 	notation?: string
 }
 
@@ -71,6 +71,10 @@ export function generateLegalMoves(piece: Piece, board: Board): Move[] {
 			return legalRookMoves(piece, board)
 		case 'Queen':
 			return legalQueenMoves(piece, board)
+		case 'Knight':
+			return legalKnightMoves(piece, board)
+		case 'King':
+			return legalKingMoves(piece, board)
 		default:
 			return []
 	}
@@ -216,10 +220,115 @@ function legalRookMoves(piece: Piece, board: Board): Move[] {
 }
 
 function legalQueenMoves(piece: Piece, board: Board): Move[] {
-	const moves: Move[] = []
-
 	const diagonalMoves = legalBishopMoves(piece, board)
 	const lateralMoves = legalRookMoves(piece, board)
 
 	return [...diagonalMoves, ...lateralMoves]
+}
+
+function legalKnightMoves(piece: Piece, board: Board): Move[] {
+	const moves: Move[] = []
+	const [i, j] = coordinatesFromPosition(piece.position)
+	const originSqr = board.grid[i][j]
+
+	let directions: [number, number][] = [
+		[+2, +1],
+		[+2, -1],
+		[-2, +1],
+		[-2, -1],
+
+		[+1, +2],
+		[-1, +2],
+		[+1, -2],
+		[-1, -2],
+	]
+
+	directions.forEach((dir) => {
+		const newI = i + dir[0]
+		const newJ = j + dir[1]
+		if (newI > 7 || newI < 0 || newJ > 7 || newJ < 0) {
+			return moves
+		}
+
+		// if (i === iCur && j === jCur) return
+
+		const trgtSqr = board.grid[newI][newJ]
+		if (trgtSqr.piece) {
+			if (piece.color === trgtSqr.piece.color) {
+				// Same colored piece
+				return
+			} else {
+				// Opposite color piece (Capture)
+				let move: Move = new Move()
+				move.from = originSqr
+				move.to = board.grid[newI][newJ]
+				move.piece = piece
+				move.isCapture = true
+
+				moves.push(move)
+			}
+		} else {
+			let move: Move = new Move()
+			move.from = originSqr
+			move.to = board.grid[newI][newJ]
+			move.piece = piece
+			move.isCapture = false
+			moves.push(move)
+		}
+	})
+
+	return moves
+}
+
+function legalKingMoves(piece: Piece, board: Board) {
+	const moves: Move[] = []
+	const [i, j] = coordinatesFromPosition(piece.position)
+	const originSqr = board.grid[i][j]
+
+	let directions: [number, number][] = [
+		[-1, 0], // UP
+		[-1, -1], // UP-LEFT
+		[0, -1], // LEFT
+		[+1, -1], // BOTTOM-LEFT
+		[+1, 0], // BOTTOM
+		[+1, +1], // BOTTOM-RIGHT
+		[0, +1], // RIGHT
+		[-1, +1], // TOP-RIGHT
+	]
+
+	directions.forEach((dir) => {
+		const newI = i + dir[0]
+		const newJ = j + dir[1]
+		if (newI > 7 || newI < 0 || newJ > 7 || newJ < 0) {
+			return moves
+		}
+
+		// if (i === iCur && j === jCur) return
+
+		const trgtSqr = board.grid[newI][newJ]
+		if (trgtSqr.piece) {
+			if (piece.color === trgtSqr.piece.color) {
+				// Same colored piece
+				return
+			} else {
+				// Opposite color piece (Capture)
+				let move: Move = new Move()
+				move.from = originSqr
+				move.to = board.grid[newI][newJ]
+				move.piece = piece
+				move.isCapture = true
+
+				moves.push(move)
+			}
+		} else {
+			let move: Move = new Move()
+			move.from = originSqr
+			move.to = board.grid[newI][newJ]
+			move.piece = piece
+			move.isCapture = false
+			moves.push(move)
+		}
+	})
+
+	return moves
 }

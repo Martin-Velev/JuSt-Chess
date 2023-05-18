@@ -13,9 +13,6 @@ export class ChessGame {
 	}
 
 	makeMove(move: Move) {
-		console.log('called')
-		console.log('move', move)
-
 		const [i, j] = coordinatesFromPosition(move.to.id)
 		const [iOrigin, jOrigin] = coordinatesFromPosition(move.from.id)
 		const newGrid: Square[][] = [...this.board.grid]

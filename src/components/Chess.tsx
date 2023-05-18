@@ -24,10 +24,6 @@ export default function Chess() {
 	}
 
 	function handleSqrClick(sqr: Square) {
-		// console.log('moves', game.legalMoves)
-		// console.log('selectedPiece', selectedPiece)
-		// console.log('origin', originSquare)
-		// console.log('sqr', sqr)
 		if (game.legalMoves && selectedPiece) {
 			// Piece selected. Attempting move
 			const possibleMoveSqrs = game.legalMoves.map((move) => move.to.id)
@@ -41,7 +37,6 @@ export default function Chess() {
 					to: sqr,
 					piece: selectedPiece,
 				}
-				console.log('calling move', move)
 				game.makeMove(move)
 			}
 
