@@ -4,9 +4,10 @@ import { coordinatesFromPosition, positionFromCoordinates } from './utils'
 export class Move {
 	to: Square
 	from: Square
-	notation: string
 	piece: Piece
 	isCapture?: boolean
+	
+	notation?: string
 }
 
 function checkLine(
@@ -66,6 +67,10 @@ export function generateLegalMoves(piece: Piece, board: Board): Move[] {
 			return legalPawnMoves(piece, board)
 		case 'Bishop':
 			return legalBishopMoves(piece, board)
+		case 'Rook':
+			return legalRookMoves(piece, board)
+		case 'Queen':
+			return legalQueenMoves(piece, board)
 		default:
 			return []
 	}
@@ -149,7 +154,7 @@ function legalPawnMoves(piece: Piece, board: Board): Move[] {
 function legalBishopMoves(piece: Piece, board: Board): Move[] {
 	let moves: Move[] = []
 
-	if (piece.type !== 'Bishop') return null
+	// if (piece.type !== 'Bishop' ) return null
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position)
 	const originSqr = board.grid[iCur][jCur]
@@ -178,4 +183,43 @@ function legalBishopMoves(piece: Piece, board: Board): Move[] {
 	})
 
 	return moves
+}
+
+function legalRookMoves(piece: Piece, board: Board): Move[] {
+	let moves: Move[] = []
+
+	const [iCur, jCur] = coordinatesFromPosition(piece.position)
+	const originSqr = board.grid[iCur][jCur]
+
+	const directions: [number, number][] = [
+		[-1, 0], // UP
+		[+1, 0], // DOWN
+		[0, -1], // LEFT
+		[0, +1], // RIGHT
+	]
+
+	directions.forEach((direction) => {
+		const newMoves = checkLine(
+			[iCur, jCur],
+			direction,
+			board,
+			piece,
+			originSqr,
+			moves
+		)
+
+		if (newMoves && newMoves.length > 0) {
+			moves.push(...newMoves)
+		}
+	})
+	return moves
+}
+
+function legalQueenMoves(piece: Piece, board: Board): Move[] {
+	const moves: Move[] = []
+
+	const diagonalMoves = legalBishopMoves(piece, board)
+	const lateralMoves = legalRookMoves(piece, board)
+
+	return [...diagonalMoves, ...lateralMoves]
 }

@@ -10,7 +10,7 @@ import {
 import { ChessGame } from '../game/game'
 import { FEN_STARTING_POSITION, FILES, RANKS } from '../constants'
 import { Piece, Square } from '../game/board'
-import { generateLegalMoves } from '../game/move'
+import { Move, generateLegalMoves } from '../game/move'
 
 export default function Chess() {
 	const [game, setGame] = useState(
@@ -28,30 +28,21 @@ export default function Chess() {
 		// console.log('selectedPiece', selectedPiece)
 		// console.log('origin', originSquare)
 		// console.log('sqr', sqr)
-		setGame({
-			...game,
-			legalMoves: [],
-		})
 		if (game.legalMoves && selectedPiece) {
 			// Piece selected. Attempting move
 			const possibleMoveSqrs = game.legalMoves.map((move) => move.to.id)
 
 			if (possibleMoveSqrs.includes(sqr.id)) {
+				if (selectedPiece.color !== game.toMove) return
 				// MOVE PIECE
 
-				const [i, j] = coordinatesFromPosition(sqr.id)
-				const [iOrigin, jOrigin] = coordinatesFromPosition(originSquare.id)
-				const newGrid: Square[][] = { ...game.board.grid }
-
-				newGrid[i][j].piece = { ...selectedPiece, position: sqr.id }
-				newGrid[iOrigin][jOrigin].piece = null
-				const newBoard = { ...game.board, grid: newGrid }
-
-				setGame({
-					...game,
-					board: newBoard,
-					legalMoves: [],
-				})
+				const move: Move = {
+					from: originSquare,
+					to: sqr,
+					piece: selectedPiece,
+				}
+				console.log('calling move', move)
+				game.makeMove(move)
 			}
 
 			setSelectedPiece(null)
@@ -60,16 +51,14 @@ export default function Chess() {
 		}
 
 		if (!selectedPiece && sqr.piece) {
+			if (sqr.piece.color !== game.toMove) return
 			// Selecting piece
 			setSelectedPiece(sqr.piece)
 			setOriginSquare(sqr)
 
 			const moves = generateLegalMoves(sqr.piece, game.board)
 			if (moves) {
-				setGame({
-					...game,
-					legalMoves: moves,
-				})
+				game.legalMoves = moves
 				const possibleMoveSqrs = moves.map((move) => move.to.id)
 
 				possibleMoveSqrs.forEach((sqrId) => {
@@ -83,6 +72,8 @@ export default function Chess() {
 					}
 				})
 			}
+		} else {
+			game.legalMoves = []
 		}
 	}
 
@@ -98,16 +89,12 @@ export default function Chess() {
 			}),
 		}
 
-		const clGame: ChessGame = {
-			...game,
-			board: cleanBoard,
-		}
-
-		setGame(clGame)
+		game.board = cleanBoard
 	}
 
 	return (
 		<div id="Chess">
+			{game.toMove}
 			<div className="col">
 				<div className="fileNotation">
 					{FILES.map((file) => (
