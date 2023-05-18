@@ -89,7 +89,6 @@ export default function Chess() {
 
 	return (
 		<div id="Chess">
-			{game.toMove}
 			<div className="col">
 				<div className="fileNotation">
 					{FILES.map((file) => (
