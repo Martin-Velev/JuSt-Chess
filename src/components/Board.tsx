@@ -2,7 +2,7 @@ import * as React from 'react'
 import '../style/Board.css'
 import { RANKS } from '../constants'
 import PieceComponent from './Piece'
-import { Board, Square } from '../game/board'
+import { Square } from '../game/board'
 
 type BoardComponentProps = {
 	board: Square[][]

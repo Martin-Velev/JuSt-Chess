@@ -1,4 +1,4 @@
-import { Board, Piece, Square } from './board'
+import { Square } from './board'
 import { Move } from './move'
 import { coordinatesFromPosition } from './utils'
 

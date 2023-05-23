@@ -1,5 +1,5 @@
 import { FILES, PIECE_ABR, PIECE_MAP, RANKS } from '../constants'
-import { Board, Square } from './board'
+import { Square } from './board'
 
 /**
  *
@@ -7,7 +7,6 @@ import { Board, Square } from './board'
  * @returns {Square[][]} Board object
  */
 export function getBoardFromFEN(fen: string): Square[][] {
-
 	const fields = fen.split(' ')
 	// SETUP PIECES
 
@@ -34,7 +33,7 @@ export function getBoardFromFEN(fen: string): Square[][] {
 					color,
 					type,
 					symbol,
-					position
+					position,
 				}
 
 				grid[i][j].piece = piece
