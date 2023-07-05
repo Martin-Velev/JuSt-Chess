@@ -12,7 +12,7 @@ import { Piece, Square } from '../game/board'
 import {
 	Move,
 	generateLegalMoves,
-} from '../game/move'
+} from '../game/rules'
 
 export default function Chess() {
 	const [game, setGame] = useState(
