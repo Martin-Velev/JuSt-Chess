@@ -51,7 +51,6 @@ export function piecesOnBoard(filter: PieceFilter, board: Square[][]): Piece[] {
 				return true
 			})
 
-			// console.log('fltr', filteredPieces)
 
 			if (filteredPieces.length > 0) {
 				return [...prev, ...filteredPieces]
@@ -76,16 +75,12 @@ export function isThreatened(piece: Piece, game: ChessGame): boolean {
 	if (bishops.length > 0) {
 		let moves: Move[] = []
 		moves = bishops.reduce((moves, bishop) => {
-			// console.log('legal bish moves', legalBishopMoves(bishop, game))
 			return [...moves, ...legalBishopMoves(bishop, game)]
 		}, [])
-		console.log('all bishop moves', moves)
 		if (moves.length > 0) {
-			console.log('moveTo - curPos', moves[0].to, '-', piece.position)
 			moves = moves.filter(
 				(move) => move.to.id === piece.position && move.isCapture
 			)
-			console.log('fltrd', moves)
 			if (moves.length > 0) {
 				return true
 			}
@@ -94,7 +89,6 @@ export function isThreatened(piece: Piece, game: ChessGame): boolean {
 	}
 	// legalBishopMoves()
 
-	console.log('bishops', bishops)
 	return false
 }
 
@@ -104,8 +98,6 @@ function legalMoves(
 	game: ChessGame
 ): Move[] {
 
-	console.log('================')
-	console.log('legal moves inp', directions)
 	const { board } = game
 	let moves: Move[] = []
 	const [i, j] = coordinatesFromPosition(piece.position)
@@ -144,7 +136,6 @@ function legalMoves(
 		}
 	})
 
-	console.log('lgl moves out', moves)
 	return moves
 }
 
@@ -187,7 +178,6 @@ function checkLine(
 		move.isCapture = false
 		moves = [...moves, move]
 
-		console.log('mvs', moves, moves.length)
 		return checkLine([newI, newJ], [iIncr, jIncr], board, piece, originSqr, [
 			...moves,
 		])
@@ -334,18 +324,16 @@ function legalBishopMoves(piece: Piece, game: ChessGame): Move[] {
 			[iCur, jCur],
 			direction,
 			board,
-			piece
+			piece,
 			originSqr,
 			[]
 		)
 
-		console.log('new move', newMoves, direction)
 
 		if (newMoves && newMoves.length > 0) {
 			moves.push(...newMoves)
 		}
 	})
-	console.log('bishy bish', moves)
 
 	return moves
 }

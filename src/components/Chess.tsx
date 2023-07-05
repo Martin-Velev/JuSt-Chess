@@ -25,12 +25,10 @@ export default function Chess() {
 
 	function handleSqrClick(sqr: Square) {
 
-		// console.log('')
 		if (game.legalMoves && selectedPiece) {
 			// Piece selected. Attempting move
 			const possibleMoveSqrs = game.legalMoves.map((move) => move.to.id)
 
-			console.log('is threatened', isThreatened(selectedPiece, game))
 
 			if (possibleMoveSqrs.includes(sqr.id)) {
 				if (selectedPiece.color !== game.toMove) return
@@ -43,7 +41,6 @@ export default function Chess() {
 				}
 				game.makeMove(move)
 
-				// console.log('threat', isThreatened(selectedPiece, game.board))
 			}
 
 			setSelectedPiece(null)
@@ -79,7 +76,6 @@ export default function Chess() {
 	}
 
 	function cleanBoardStyles() {
-		// console.log(game)
 		const cleanBoard = game.board.map((rank: Square[]) => {
 			return rank.map((sqr) => {
 				return {
