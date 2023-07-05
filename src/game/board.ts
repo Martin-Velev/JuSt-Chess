@@ -13,6 +13,6 @@ export class Square {
 export class Piece {
 	symbol: string
 	type: string
-	position: string
+	position: Square
 	color: string
 }

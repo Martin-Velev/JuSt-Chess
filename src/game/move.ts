@@ -29,8 +29,9 @@ const KNIGHT_MOVES: [number, number][] = [
 export class Move {
 	to: Square
 	from: Square
-	piece: Piece
+	originPiece: Piece
 	isCapture?: boolean
+	capturedPiece?: Piece
 
 	notation?: string
 }
@@ -51,7 +52,6 @@ export function piecesOnBoard(filter: PieceFilter, board: Square[][]): Piece[] {
 				return true
 			})
 
-
 			if (filteredPieces.length > 0) {
 				return [...prev, ...filteredPieces]
 			}
@@ -62,45 +62,32 @@ export function piecesOnBoard(filter: PieceFilter, board: Square[][]): Piece[] {
 }
 
 export function isThreatened(piece: Piece, game: ChessGame): boolean {
-	// const diagonals = checkLine(DIAGONALS)
-
 	const { board } = game
 	const oppositeColor = piece.color === 'white' ? 'black' : 'white'
 
-	const bishops: Piece[] = piecesOnBoard(
-		{ type: 'Bishop', color: oppositeColor },
-		board
+	const oppositePieces: Piece[] = piecesOnBoard({ color: oppositeColor }, board)
+	const possibleMoves: Move[] = oppositePieces.reduce((moves, piece) => {
+		const newMoves = generateLegalMoves(piece, game)
+		return [...moves, ...newMoves]
+	}, [])
+	const possibleCaptures: Move[] = possibleMoves.filter(
+		(move) => move.isCapture
 	)
 
-	if (bishops.length > 0) {
-		let moves: Move[] = []
-		moves = bishops.reduce((moves, bishop) => {
-			return [...moves, ...legalBishopMoves(bishop, game)]
-		}, [])
-		if (moves.length > 0) {
-			moves = moves.filter(
-				(move) => move.to.id === piece.position && move.isCapture
-			)
-			if (moves.length > 0) {
-				return true
-			}
-			// return true
-		}
+	if (possibleCaptures.find((move) => move.to.id === piece.position.id)) {
+		return true
 	}
-	// legalBishopMoves()
-
 	return false
 }
 
-function legalMoves(
+function legalSingleMove(
 	directions: [number, number][],
 	piece: Piece,
 	game: ChessGame
 ): Move[] {
-
 	const { board } = game
 	let moves: Move[] = []
-	const [i, j] = coordinatesFromPosition(piece.position)
+	const [i, j] = coordinatesFromPosition(piece.position.id)
 	const originSqr = board[i][j]
 	directions.forEach((dir) => {
 		const newI = i + dir[0]
@@ -108,8 +95,6 @@ function legalMoves(
 		if (newI > 7 || newI < 0 || newJ > 7 || newJ < 0) {
 			return moves
 		}
-
-		// if (i === iCur && j === jCur) return
 
 		const trgtSqr = board[newI][newJ]
 		if (trgtSqr.piece) {
@@ -121,8 +106,9 @@ function legalMoves(
 				let move: Move = new Move()
 				move.from = originSqr
 				move.to = board[newI][newJ]
-				move.piece = piece
+				move.originPiece = piece
 				move.isCapture = true
+				move.capturedPiece = move.to.piece
 
 				moves = [...moves, move]
 			}
@@ -130,7 +116,7 @@ function legalMoves(
 			let move: Move = new Move()
 			move.from = originSqr
 			move.to = board[newI][newJ]
-			move.piece = piece
+			move.originPiece = piece
 			move.isCapture = false
 			moves = [...moves, move]
 		}
@@ -165,8 +151,9 @@ function checkLine(
 			let move: Move = new Move()
 			move.from = originSqr
 			move.to = board[newI][newJ]
-			move.piece = piece
+			move.originPiece = piece
 			move.isCapture = true
+			move.capturedPiece = move.to.piece
 
 			return [...moves, move]
 		}
@@ -174,7 +161,7 @@ function checkLine(
 		let move: Move = new Move()
 		move.from = originSqr
 		move.to = board[newI][newJ]
-		move.piece = piece
+		move.originPiece = piece
 		move.isCapture = false
 		moves = [...moves, move]
 
@@ -207,7 +194,7 @@ export function generateLegalMoves(piece: Piece, game: ChessGame): Move[] {
 function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 	const moves = []
 
-	const [iCur, jCur] = coordinatesFromPosition(piece.position)
+	const [iCur, jCur] = coordinatesFromPosition(piece.position.id)
 
 	const originSqr = board[iCur][jCur]
 	const pawnDir = piece.color === 'white' ? -1 : +1
@@ -265,7 +252,7 @@ function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 	targetI = iCur + pawnDir * 2
 	if (targetI < 8 && targetI >= 0) {
 		const initialRank = piece.color === 'white' ? 2 : 7
-		const isInitalRank = parseInt(piece.position.split('')[1]) === initialRank
+		const isInitalRank = parseInt(piece.position.id.split('')[1]) === initialRank
 		const twoForward = new Move()
 		twoForward.from = originSqr
 		twoForward.to = board[targetI][jCur]
@@ -283,7 +270,7 @@ function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 function legalRookMoves(piece: Piece, { board }: ChessGame): Move[] {
 	let moves: Move[] = []
 
-	const [iCur, jCur] = coordinatesFromPosition(piece.position)
+	const [iCur, jCur] = coordinatesFromPosition(piece.position.id)
 	const originSqr = board[iCur][jCur]
 
 	const directions = RANK_FILE
@@ -306,17 +293,16 @@ function legalRookMoves(piece: Piece, { board }: ChessGame): Move[] {
 
 function legalKnightMoves(piece: Piece, game: ChessGame): Move[] {
 	let directions = KNIGHT_MOVES
-	return legalMoves(directions, piece, game)
+	return legalSingleMove(directions, piece, game)
 }
 
 function legalBishopMoves(piece: Piece, game: ChessGame): Move[] {
 	const { board } = game
 
-	const [iCur, jCur] = coordinatesFromPosition(piece.position)
+	const [iCur, jCur] = coordinatesFromPosition(piece.position.id)
 	const originSqr = board[iCur][jCur]
 
 	const directions = DIAGONALS
-
 
 	let moves: Move[] = []
 	directions.forEach((direction) => {
@@ -328,7 +314,6 @@ function legalBishopMoves(piece: Piece, game: ChessGame): Move[] {
 			originSqr,
 			[]
 		)
-
 
 		if (newMoves && newMoves.length > 0) {
 			moves.push(...newMoves)
@@ -357,5 +342,5 @@ function legalKingMoves(piece: Piece, game: ChessGame) {
 		[-1, +1], // TOP-RIGHT
 	]
 
-	return legalMoves(directions, piece, game)
+	return legalSingleMove(directions, piece, game)
 }

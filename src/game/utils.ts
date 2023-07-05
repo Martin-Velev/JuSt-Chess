@@ -27,7 +27,7 @@ export function getBoardFromFEN(fen: string): Square[][] {
 				let [color, type] = symbol.split('')
 				color = color === 'w' ? 'white' : 'black'
 				type = PIECE_ABR[type as keyof typeof PIECE_ABR]
-				const position = positionFromCoordinates([i, j])
+				const position: Square = grid[i][j]
 
 				const piece = {
 					color,

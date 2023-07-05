@@ -17,7 +17,7 @@ export class ChessGame {
 		const [iOrigin, jOrigin] = coordinatesFromPosition(move.from.id)
 		const newGrid: Square[][] = [...this.board]
 
-		newGrid[i][j].piece = { ...move.piece, position: move.to.id }
+		newGrid[i][j].piece = { ...move.originPiece, position: move.to }
 		newGrid[iOrigin][jOrigin].piece = null
 		this.board = newGrid
 
