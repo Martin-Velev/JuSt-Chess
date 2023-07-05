@@ -10,7 +10,7 @@ import {
 import { ChessGame } from '../game/game'
 import { FEN_STARTING_POSITION, FILES, RANKS } from '../constants'
 import { Piece, Square } from '../game/board'
-import { Move, generateLegalMoves, isThreatened } from '../game/move'
+import { Move, generateLegalMoves, isThreatened, piecesOnBoard } from '../game/move'
 
 export default function Chess() {
 	const [game, setGame] = useState(
@@ -24,11 +24,13 @@ export default function Chess() {
 	}
 
 	function handleSqrClick(sqr: Square) {
+
+		// console.log('')
 		if (game.legalMoves && selectedPiece) {
 			// Piece selected. Attempting move
 			const possibleMoveSqrs = game.legalMoves.map((move) => move.to.id)
 
-			console.log('is threatened', isThreatened(selectedPiece, game.board))
+			console.log('is threatened', isThreatened(selectedPiece, game))
 
 			if (possibleMoveSqrs.includes(sqr.id)) {
 				if (selectedPiece.color !== game.toMove) return

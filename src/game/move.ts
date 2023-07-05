@@ -1,6 +1,6 @@
 import { Piece, Square } from './board'
 import { ChessGame } from './game'
-import { coordinatesFromPosition } from './utils'
+import { coordinatesFromPosition, positionFromCoordinates } from './utils'
 
 const DIAGONALS: [number, number][] = [
 	[-1, -1],
@@ -39,36 +39,63 @@ interface PieceFilter {
 	color?: string
 	type?: string
 }
-export function isThreatened(piece: Piece, board: Square[][]) {
+
+export function piecesOnBoard(filter: PieceFilter, board: Square[][]): Piece[] {
+	const pieces = board.reduce((prev, rank) => {
+		const sqrsWithPiece = rank.filter((sqr) => !!sqr.piece)
+		const pieces = sqrsWithPiece.map((sqr) => sqr.piece)
+		if (pieces.length > 0 && filter) {
+			let filteredPieces = pieces.filter((piece) => {
+				if (filter.color && piece.color !== filter.color) return false
+				if (filter.type && piece.type !== filter.type) return false
+				return true
+			})
+
+			// console.log('fltr', filteredPieces)
+
+			if (filteredPieces.length > 0) {
+				return [...prev, ...filteredPieces]
+			}
+		}
+		return prev
+	}, [])
+	return pieces as Piece[]
+}
+
+export function isThreatened(piece: Piece, game: ChessGame): boolean {
 	// const diagonals = checkLine(DIAGONALS)
 
-	function pieceOnBoard(filter: PieceFilter, board: Square[][]): Piece[] {
-		const pieces = board.reduce((prev, rank) => {
-			const pieces = rank.filter((sqr) => sqr.piece).map((sqr) => sqr.piece)
-			if (pieces.length > 0 && filter) {
-				let filteredPieces = pieces.filter((piece) => {
-					
-				})
-
-				console.log('fltr', filteredPieces)
-				if (filteredPieces.length > 0) {
-					return [...prev, ...filteredPieces]
-				}
-			}
-			return prev
-		}, [])
-		console.log('final', pieces)
-		return []
-	}
-
+	const { board } = game
 	const oppositeColor = piece.color === 'white' ? 'black' : 'white'
 
-	const bishops: Piece[] = pieceOnBoard(
+	const bishops: Piece[] = piecesOnBoard(
 		{ type: 'Bishop', color: oppositeColor },
 		board
 	)
 
+	if (bishops.length > 0) {
+		let moves: Move[] = []
+		moves = bishops.reduce((moves, bishop) => {
+			// console.log('legal bish moves', legalBishopMoves(bishop, game))
+			return [...moves, ...legalBishopMoves(bishop, game)]
+		}, [])
+		console.log('all bishop moves', moves)
+		if (moves.length > 0) {
+			console.log('moveTo - curPos', moves[0].to, '-', piece.position)
+			moves = moves.filter(
+				(move) => move.to.id === piece.position && move.isCapture
+			)
+			console.log('fltrd', moves)
+			if (moves.length > 0) {
+				return true
+			}
+			// return true
+		}
+	}
+	// legalBishopMoves()
+
 	console.log('bishops', bishops)
+	return false
 }
 
 function legalMoves(
@@ -76,6 +103,9 @@ function legalMoves(
 	piece: Piece,
 	game: ChessGame
 ): Move[] {
+
+	console.log('================')
+	console.log('legal moves inp', directions)
 	const { board } = game
 	let moves: Move[] = []
 	const [i, j] = coordinatesFromPosition(piece.position)
@@ -102,7 +132,7 @@ function legalMoves(
 				move.piece = piece
 				move.isCapture = true
 
-				moves.push(move)
+				moves = [...moves, move]
 			}
 		} else {
 			let move: Move = new Move()
@@ -110,9 +140,11 @@ function legalMoves(
 			move.to = board[newI][newJ]
 			move.piece = piece
 			move.isCapture = false
-			moves.push(move)
+			moves = [...moves, move]
 		}
 	})
+
+	console.log('lgl moves out', moves)
 	return moves
 }
 
@@ -127,7 +159,7 @@ function checkLine(
 	const newI = i + iIncr
 	const newJ = j + jIncr
 	if (newI > 7 || newI < 0 || newJ > 7 || newJ < 0) {
-		return moves
+		return [...moves]
 	}
 
 	// if (i === iCur && j === jCur) return
@@ -136,7 +168,7 @@ function checkLine(
 	if (trgtSqr.piece) {
 		if (piece.color === trgtSqr.piece.color) {
 			// Same colored piece
-			return
+			return null
 		} else {
 			// Opposite color piece (Capture)
 			let move: Move = new Move()
@@ -153,16 +185,12 @@ function checkLine(
 		move.to = board[newI][newJ]
 		move.piece = piece
 		move.isCapture = false
-		moves.push(move)
+		moves = [...moves, move]
 
-		return checkLine(
-			[newI, newJ],
-			[iIncr, jIncr],
-			board,
-			piece,
-			originSqr,
-			moves
-		)
+		console.log('mvs', moves, moves.length)
+		return checkLine([newI, newJ], [iIncr, jIncr], board, piece, originSqr, [
+			...moves,
+		])
 	}
 }
 
@@ -293,27 +321,31 @@ function legalKnightMoves(piece: Piece, game: ChessGame): Move[] {
 
 function legalBishopMoves(piece: Piece, game: ChessGame): Move[] {
 	const { board } = game
-	let moves: Move[] = []
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position)
 	const originSqr = board[iCur][jCur]
 
 	const directions = DIAGONALS
 
+
+	let moves: Move[] = []
 	directions.forEach((direction) => {
 		const newMoves = checkLine(
 			[iCur, jCur],
 			direction,
 			board,
-			piece,
+			piece
 			originSqr,
-			moves
+			[]
 		)
+
+		console.log('new move', newMoves, direction)
 
 		if (newMoves && newMoves.length > 0) {
 			moves.push(...newMoves)
 		}
 	})
+	console.log('bishy bish', moves)
 
 	return moves
 }
