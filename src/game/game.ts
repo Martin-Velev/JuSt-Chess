@@ -1,5 +1,4 @@
-import { Square } from './board'
-import { Move } from './move'
+import { Move, Square } from './board'
 import { coordinatesFromPosition } from './utils'
 
 export class ChessGame {

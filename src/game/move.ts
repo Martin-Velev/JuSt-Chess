@@ -1,40 +1,6 @@
-import { Piece, Square } from './board'
+import { DIAGONALS, KNIGHT_MOVES, Move, Piece, RANK_FILE, Square } from './board'
 import { ChessGame } from './game'
-import { coordinatesFromPosition, positionFromCoordinates } from './utils'
-
-const DIAGONALS: [number, number][] = [
-	[-1, -1],
-	[-1, +1],
-	[+1, -1],
-	[+1, +1],
-]
-const RANK_FILE: [number, number][] = [
-	[-1, 0], // UP
-	[+1, 0], // DOWN
-	[0, -1], // LEFT
-	[0, +1], // RIGHT
-]
-const KNIGHT_MOVES: [number, number][] = [
-	[+2, +1],
-	[+2, -1],
-	[-2, +1],
-	[-2, -1],
-
-	[+1, +2],
-	[-1, +2],
-	[+1, -2],
-	[-1, -2],
-]
-
-export class Move {
-	to: Square
-	from: Square
-	originPiece: Piece
-	isCapture?: boolean
-	capturedPiece?: Piece
-
-	notation?: string
-}
+import { coordinatesFromPosition } from './utils'
 
 interface PieceFilter {
 	color?: string
@@ -344,3 +310,5 @@ function legalKingMoves(piece: Piece, game: ChessGame) {
 
 	return legalSingleMove(directions, piece, game)
 }
+export { Move }
+

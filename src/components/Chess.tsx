@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import BoardComponent from './Board'
 import '../style/Chess.css'
 import {
 	coordinatesFromPosition,
 	getBoardFromFEN,
-	positionFromCoordinates,
 } from '../game/utils'
 import { ChessGame } from '../game/game'
 import { FEN_STARTING_POSITION, FILES, RANKS } from '../constants'
@@ -13,8 +12,6 @@ import { Piece, Square } from '../game/board'
 import {
 	Move,
 	generateLegalMoves,
-	isThreatened,
-	piecesOnBoard,
 } from '../game/move'
 
 export default function Chess() {
