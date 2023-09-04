@@ -1,6 +1,13 @@
-import { DIAGONALS, KNIGHT_MOVES, Move, Piece, RANK_FILE, Square } from './board'
+import {
+	DIAGONALS,
+	KNIGHT_MOVES,
+	Move,
+	Piece,
+	RANK_FILE,
+	Square,
+} from './board'
 import { ChessGame } from './game'
-import { coordinatesFromPosition } from './utils'
+import { coordinatesFromPosition, positionFromCoordinates } from './utils'
 
 interface PieceFilter {
 	color?: string
@@ -157,8 +164,10 @@ export function generateLegalMoves(piece: Piece, game: ChessGame): Move[] {
 	}
 }
 
-function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
+function legalPawnMoves(piece: Piece, game: ChessGame): Move[] {
+	const board = game.board
 	const moves = []
+	const enPassantSqr = game.metaData && game.metaData.enPassantTargetSquare
 
 	const [iCur, jCur] = coordinatesFromPosition(piece.position.id)
 
@@ -173,7 +182,11 @@ function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 		if (targetJLeft > 0) {
 			const targetPiece = board[targetI][targetJLeft].piece
 
-			if (targetPiece && targetPiece.color !== piece.color) {
+			const isEnPassant =
+				enPassantSqr &&
+				enPassantSqr === positionFromCoordinates([targetI, targetJLeft])
+
+			if (isEnPassant || (targetPiece && targetPiece.color !== piece.color)) {
 				const captureLeft = new Move()
 
 				captureLeft.from = originSqr
@@ -188,7 +201,11 @@ function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 		if (targetJRight < 8) {
 			const targetPiece = board[targetI][targetJRight].piece
 
-			if (targetPiece && targetPiece.color !== piece.color) {
+			const isEnPassant =
+				enPassantSqr &&
+				enPassantSqr === positionFromCoordinates([targetI, targetJRight])
+
+			if (isEnPassant || (targetPiece && targetPiece.color !== piece.color)) {
 				const captureRight = new Move()
 
 				captureRight.from = originSqr
@@ -218,7 +235,8 @@ function legalPawnMoves(piece: Piece, { board }: ChessGame): Move[] {
 	targetI = iCur + pawnDir * 2
 	if (targetI < 8 && targetI >= 0) {
 		const initialRank = piece.color === 'white' ? 2 : 7
-		const isInitalRank = parseInt(piece.position.id.split('')[1]) === initialRank
+		const isInitalRank =
+			parseInt(piece.position.id.split('')[1]) === initialRank
 		const twoForward = new Move()
 		twoForward.from = originSqr
 		twoForward.to = board[targetI][jCur]
@@ -310,5 +328,5 @@ function legalKingMoves(piece: Piece, game: ChessGame) {
 
 	return legalSingleMove(directions, piece, game)
 }
-export { Move }
 
+export { Move }
